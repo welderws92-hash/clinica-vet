@@ -4,7 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\ServicoController;
+use App\Http\Controllers\TutorController;
+use App\Http\Controllers\AnimalController;
+use App\Http\Controllers\SpecieController;
+use App\Http\Controllers\RaceController;
+
 
 // Redirecionamentos da raiz
 Route::get('/', function () {
@@ -29,11 +33,25 @@ Route::middleware(['auth', 'user.active'])->group(function () {
     // CRUD de usuários
     Route::middleware(['role:admin'])->group(function() {
         Route::resource('users', UserController::class)->parameters([
-                'users' => 'user',
+            'users' => 'user',
         ]);
-Route::resource('servicos', ServicoController::class)->except(['show']);
-       
     });
+
+    Route::resource('tutors', TutorController::class)->parameters([
+        'tutors' => 'tutor',
+    ]);
+
+    Route::resource('animals', AnimalController::class)->parameters([
+        'animals' => 'animal',
+    ]);
+
+    Route::resource('species', SpecieController::class)->parameters([
+        'species' => 'specie',
+    ]);
+
+    Route::resource('races', RaceController::class)->parameters([
+        'races' => 'race'
+    ]);
    
 });
 
