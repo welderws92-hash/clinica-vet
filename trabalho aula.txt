@@ -1,0 +1,82 @@
+Passo a Passo — Atividade Prática: Módulo de Atestados Médicos
+Aqui está o roteiro completo, sem fornecer os códigos prontos, para você desenvolver cada parte seguindo os requisitos:
+📦 1. Preparação do Ambiente Git
+Siga os passos que já foram apresentados para sincronizar com o repositório do professor e criar sua branch de trabalho:
+Mude para a branch develop e baixe as atualizações do repositório do professor.
+Crie e entre na branch nova com o nome indicado.
+Ao final de cada etapa ou após concluir tudo, salve as alterações com commit e envie a branch para o seu repositório remoto.
+🗄️ 2. Criação da Migration
+Dentro do projeto, localize o diretório de migrations.
+Crie uma nova migration com o nome indicado (create_certificates_table).
+Na função de criação da tabela, defina todos os campos solicitados:
+Campo id (padrão do Laravel).
+Chave estrangeira animal_id relacionada à tabela de animais.
+Campo title como texto curto.
+Campo issue_date como tipo data.
+Campo file_path para guardar o caminho do arquivo.
+Campo notes como texto longo e opcional.
+Configure corretamente a chave estrangeira.
+Execute a migration para criar a tabela no banco de dados.
+🧩 3. Criação do Modelo
+Crie o arquivo de Modelo com o nome Certificate.php no diretório correto.
+Defina quais campos podem ser preenchidos em massa (propriedade $fillable).
+Configure a conversão automática do campo de data (propriedade $casts).
+Estabeleça o relacionamento: um atestado pertence a um animal.
+✅ 4. Criação da Classe de Validação (Request)
+Crie o arquivo de Request com as regras de validação.
+Defina regras diferentes para criação e para edição:
+Na criação: o arquivo é obrigatório.
+Na edição: o arquivo é opcional.
+Limite os formatos aceitos apenas para PDF, JPG e PNG.
+Defina o tamanho máximo de 2MB para o arquivo.
+🎮 5. Criação do Controlador
+Crie o Controlador para gerenciar os atestados.
+Implemente as 5 operações do CRUD (listar, exibir formulário de cadastro, salvar novo, exibir formulário de edição, atualizar registro e excluir).
+Na função de salvar/atualizar:
+Processa o upload do arquivo enviado.
+Armazene o arquivo no local indicado, disco público, pasta certificates.
+Guarde apenas o caminho/endereço do arquivo no banco de dados.
+Ao editar: se um novo arquivo for enviado, primeiro exclua o arquivo antigo do armazenamento antes de salvar o novo.
+Na função de exclusão:
+Antes de apagar o registro no banco de dados, exclua o arquivo correspondente do armazenamento.
+Depois exclua o registro da tabela.
+🖼️ 6. Criação das Páginas (Arquivos Blade)
+Dentro da pasta de views, crie um subdiretório chamado certificates.
+Crie os arquivos para as telas: listagem, formulário de cadastro e formulário de edição.
+Nos formulários de cadastro e edição, não esqueça de adicionar o atributo especial que permite envio de arquivos (enctype).
+Na tela de listagem, apresente todos os registros com seus dados.
+Em cada registro, coloque um link ou botão que abre/baixa o documento anexado, usando o caminho salvo no banco para gerar o endereço público do arquivo.
+Adicione também os botões de editar e excluir em cada registro.
+🔗 7. Configuração das Rotas
+No arquivo de rotas, registre as rotas para o CRUD de atestados, apontando para as funções do seu Controlador.
+✅ 8. Testes e Envio
+Teste todo o fluxo: cadastrar um atestado com arquivo, visualizar, editar (enviando novo arquivo e sem enviar), excluir. Verifique se os arquivos antigos estão sendo apagados corretamente e se os arquivos existem no servidor.
+Quando tudo estiver funcionando, faça o commit com a mensagem indicada e envie sua branch para o repositório remoto.
+Ficou com dúvida em alguma etapa específica (como configurar a chave estrangeira, fazer o relacionamento ou gerar o link de download)? Posso detalhar melhor
+!
+
+Claro! Vou detalhar cada parte que costuma gerar dúvidas, de forma bem simples e sem te dar código pronto, só explicando o que precisa fazer em cada caso:
+🔑 Chave estrangeira (animal_id)
+É o campo que liga o atestado ao animal que ele pertence.
+Na tabela de atestados, você cria um campo animal_id e diz: "esse número tem que ser um código que existe na tabela de animais".
+Assim, não dá para cadastrar um atestado para um animal que não existe.
+🔗 Relacionamento no Modelo
+No Modelo Certificate, você avisa: "cada atestado pertence a um animal".
+Com isso, o sistema já sabe juntar as informações: quando você puxa um atestado, ele também traz os dados do animal automaticamente.
+📂 Upload e caminho do arquivo
+Quando o usuário envia o arquivo, você manda guardar na pasta certificates dentro da área pública.
+O sistema guarda o arquivo físico e te devolve o caminho/endereço dele.
+Você salva apenas esse caminho no banco de dados, não o arquivo inteiro.
+🔄 Trocar arquivo antigo ao editar
+Antes de salvar o arquivo novo, você olha qual era o caminho do arquivo antigo que já estava salvo.
+Você manda apagar o arquivo antigo do armazenamento primeiro.
+Depois guarda o arquivo novo e atualiza o caminho no banco.
+🗑️ Apagar arquivo ao excluir o registro
+Quando o usuário clica em excluir, primeiro você pega o caminho do arquivo salvo no banco e manda apagar ele do sistema.
+Só depois de apagar o arquivo, você apaga o registro do atestado no banco de dados.
+⬇️ Link de download/visualização
+Usando o caminho que você guardou no banco, você monta o endereço completo para o navegador acessar.
+Coloca esse endereço dentro de um link na tela. Assim, quem clica consegue ver ou baixar o arquivo.
+⚠️ Enctype nos formulários
+Por padrão, o formulário não aceita envio de arquivos.
+Você precisa avisar o formulário: "aqui pode enviar arquivos também". É só colocar aquela propriedade especial na tag do formulário e pronto.
