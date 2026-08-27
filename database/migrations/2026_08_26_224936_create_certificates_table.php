@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('certificates', function (Blueprint $table) {
             $table->id();
+            
+            $table->foreignId('animal_id')->constrained('animals');
+            $table->string('title');
+            $table->date('issue_date');
+            $table->string('file_path');
+            $table->string('description')->nullable();
             $table->timestamps();
         });
     }
