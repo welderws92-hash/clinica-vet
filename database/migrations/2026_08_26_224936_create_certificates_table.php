@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('title');
             $table->date('issue_date');
             $table->string('file_path');
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

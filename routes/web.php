@@ -9,6 +9,7 @@ use App\Http\Controllers\AnimalController;
 use App\Http\Controllers\SpecieController;
 use App\Http\Controllers\RaceController;
 use App\Http\Controllers\ConsultationController;
+use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\Api\DropdownController;
 
 
@@ -25,11 +26,11 @@ Route::middleware('guest')->group(function () {
 });
 
 
-// Rotas protedidas (autenticados e com conta ativa)
+// Rotas protegidas (autenticados e com conta ativa)
 Route::middleware(['auth', 'user.active'])->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');    
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    Route::get('/dashboard',  [DashboardController::class, 'index'])
+    Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
     // CRUD de usuários
@@ -59,13 +60,23 @@ Route::middleware(['auth', 'user.active'])->group(function () {
         'consultations' => 'consultation'
     ]);
 
+    Route::resource('certificates', CertificateController::class)->parameters([
+        'certificates' => 'certificate'
+    ]);
+
     // Rotas para AJAX/Fetch API interna
     Route::prefix('api-local')->group(function () {
-        Route::get('/tutors/{tutor}/animals', [DropdownController::class, 'animalsByTutor'])->name('api.animals');
+        Route::get(
+            '/tutors/{tutor}/animals',
+            [DropdownController::class, 'animalsByTutor']
+        )->name('api.animals');
 
-        Route::get('/species/{specie}/races', [DropdownController::class, 'racesBySpecie'])->name('api.races');
+        Route::get(
+            '/species/{specie}/races',
+            [DropdownController::class, 'racesBySpecie']
+        )->name('api.races');
     });
-   
+
 });
 
 

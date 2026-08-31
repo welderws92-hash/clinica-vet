@@ -1,12 +1,11 @@
-
 <?php
 
 namespace App\Http\Controllers;
 
 use App\Models\Certificate;
 use App\Models\Animal;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\CertificateRequest;
 
 class CertificateController extends Controller
 {
@@ -33,15 +32,9 @@ class CertificateController extends Controller
     /**
      * Salva um novo atestado.
      */
-    public function store(Request $request)
+    public function store(CertificateRequest $request)
     {
-        $validated = $request->validate([
-            'animal_id' => 'required|exists:animals,id',
-            'title' => 'required|string|max:255',
-            'issue_date' => 'required|date',
-            'file' => 'required|file|mimes:pdf,jpg,png|max:2048',
-            'notes' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         $validated['file_path'] = $request->file('file')
             ->store('certificates', 'public');
@@ -79,34 +72,21 @@ class CertificateController extends Controller
     /**
      * Atualiza um atestado.
      */
-    public function update(Request $request, Certificate $certificate)
+    public function update(CertificateRequest $request, Certificate $certificate)
     {
-        $validated = $request->validate([
-            'animal_id' => 'required|exists:animals,id',
-            'title' => 'required|string|max:255',
-            'issue_date' => 'required|date',
-            'file' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
-            'notes' => 'nullable|string',
-        ]);
-
-     
+        $validated = $request->validated();
 
         if ($request->hasFile('file')) {
 
-            // 1. Apaga o arquivo antigo
             Storage::disk('public')->delete(
                 $certificate->file_path
             );
 
-            // 2. Salva o novo arquivo
             $filePath = $request->file('file')
                 ->store('certificates', 'public');
 
-            // 3. Atualiza o caminho do arquivo
             $validated['file_path'] = $filePath;
         }
-
-       
 
         $certificate->update($validated);
 
@@ -120,12 +100,10 @@ class CertificateController extends Controller
      */
     public function destroy(Certificate $certificate)
     {
-        // 1. Apaga o arquivo do storage
         Storage::disk('public')->delete(
             $certificate->file_path
         );
 
-        // 2. Apaga o registro do banco
         $certificate->delete();
 
         return redirect()
