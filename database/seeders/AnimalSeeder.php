@@ -3,31 +3,47 @@
 namespace Database\Seeders;
 
 use App\Models\Animal;
-use App\Models\Race;
 use App\Models\Specie;
 use App\Models\Tutor;
 use Illuminate\Database\Seeder;
 
 class AnimalSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $tutorsIds = Tutor::pluck('id');
-        $speciesIds = Specie::pluck('id');
-        $racesIds   = Race::pluck('id');
+        $tutors = Tutor::all();
 
-        if ($tutorsIds->isEmpty() || $speciesIds->isEmpty() || $racesIds->isEmpty()) {
-            $this->command->warn('Nenhum tutor encontrado no banco. Cadastre tutores antes de rodar este Seeder.');
+        if ($tutors->isEmpty()) {
+            $this->command->warn(
+                'Nenhum tutor encontrado. Cadastre tutores antes de gerar animais.'
+            );
+
             return;
         }
 
-        Animal::factory(25)->create([
-            'tutor_id'  => fn () => $tutorsIds->random(),
-            'specie_id' => fn () => $speciesIds->random(),
-            'race_id'   => fn () => $racesIds->random(),
-        ]);
+        $speciesWithRaces = Specie::with('races')
+            ->whereIn('name', ['Cão', 'Gato', 'Ave'])
+            ->get()
+            ->filter(fn($specie) => $specie->races->isNotEmpty());
+
+        if ($speciesWithRaces->isEmpty()) {
+            $this->command->warn(
+                'Nenhuma espécie com raças cadastradas foi encontrada.'
+            );
+
+            return;
+        }
+
+        // Corrige os animais existentes sem criar outros 25 registros.
+        foreach (Animal::all() as $animal) {
+            $specie = $speciesWithRaces->random();
+            $race = $specie->races->random();
+
+            $animal->update([
+                'tutor_id' => $animal->tutor_id ?: $tutors->random()->id,
+                'specie_id' => $specie->id,
+                'race_id' => $race->id,
+            ]);
+        }
     }
 }

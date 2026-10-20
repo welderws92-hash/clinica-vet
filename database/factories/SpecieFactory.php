@@ -10,15 +10,12 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class SpecieFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = Specie::class;
+
     public function definition(): array
     {
         return [
-            'name'  => fake()->name(),
+            'name' => fake()->unique()->word(),
         ];
     }
 }
