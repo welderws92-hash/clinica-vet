@@ -9,7 +9,7 @@ use App\Models\Consultation;
 use App\Models\Specie;
 use App\Models\Tutor;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
+
 
 class DashboardController extends Controller
 {
@@ -23,7 +23,7 @@ class DashboardController extends Controller
             ->whereYear('date_time', Carbon::now()->year)
             ->where('status', 'concluida')
             ->sum('value');
-        
+
         // Tabela de próximas Consultas do Dia Atual (max 5 registros)
         $consultationOfDay = Consultation::with(['animal.tutor', 'veterinarian'])
             ->whereDate('date_time', Carbon::today())
@@ -32,22 +32,23 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+
         // Gráfico 1: Volume de consultas dos últimos 6 meses
-        $montlyAppointments = Consultation::select(
-            DB::raw('MONTH(date_time) as mes'),
-            DB::raw('YEAR(date_time) as ano'),
-            DB::raw('count(*) as total')
-        )
+        $montlyAppointments = Consultation::query()
+            ->selectRaw("CAST(strftime('%m', date_time) AS INTEGER) as mes")
+            ->selectRaw("CAST(strftime('%Y', date_time) AS INTEGER) as ano")
+            ->selectRaw('COUNT(*) as total')
             ->where('date_time', '>=', Carbon::now()->subMonths(5)->startOfMonth())
             ->groupBy('ano', 'mes')
             ->orderBy('ano', 'asc')
             ->orderBy('mes', 'asc')
             ->get();
 
+
         $labelsMonths = [];
         $dataAppointments = [];
 
-        foreach($montlyAppointments as $appointment) {
+        foreach ($montlyAppointments as $appointment) {
             $labelsMonths[] = Carbon::createFromDate($appointment->ano, $appointment->mes, 1)->translatedFormat('M/Y');
             $dataAppointments[] = $appointment->total;
         }
@@ -59,7 +60,7 @@ class DashboardController extends Controller
 
         $labelsSpecies = $animalsBySpecie->pluck('name')->toArray();
         $speciesData = $animalsBySpecie->pluck('animals_count')->toArray();
-        
+
 
         return view('dashboard', compact(
             'totalTutors',
