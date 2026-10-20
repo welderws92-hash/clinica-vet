@@ -14,19 +14,29 @@ class CheckUserStatus
      *
      * @param  Closure(Request): (Response)  $next
      */
+
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check() && !Auth::user()->status) {
+            // Para a API, devolve erro HTTP 403 em vez de redirecionar.
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Sua conta está desativada.',
+                ], 403);
+            }
+
+            // Para o sistema web, encerra a sessão.
             Auth::logout();
 
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
             return redirect()->route('login')->withErrors([
-                'email' => 'Sua conta foi desativada. Entre em contato com o suporte.',
+                'email' => 'Sua conta está desativada. Entre em contato com o suporte.',
             ]);
         }
 
         return $next($request);
     }
+
 }

@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login', [AuthController::class, 'login']);
 
 // Endpoints Protegidos por Bearer Token via Sanctum
-Route::middleware('auth:sanctum')->name('api')->group(function () {
+Route::middleware(['auth:sanctum', 'user.active'])->name('api')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
 
